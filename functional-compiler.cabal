@@ -1,0 +1,54 @@
+name:                functional-compiler
+version:             0.1.0.0
+-- synopsis:
+-- description:
+homepage:            https://github.com/jcepedavillamayor/functional-compiler#readme
+license:             BSD3
+license-file:        LICENSE
+author:              Jaime Cepeda
+maintainer:          jcepedavillamayor@gmail.com
+copyright:           2017 Jaime Cepeda Villamayor
+category:            Compiler
+build-type:          Simple
+extra-source-files:  README.md
+                     src/Tokens.x
+                     src/Grammar.y
+cabal-version:       >=1.10
+
+library
+  hs-source-dirs:      src
+  exposed-modules:     Lib
+                       , Tokens
+                       , Grammar
+  build-depends:       base >= 4.7 && < 5
+                       , containers == 0.5.*
+                       , pretty == 1.1.*
+                       , array >= 0.4 && < 0.6
+                       , transformers >= 0.3 && < 0.6
+                       , monads-tf == 0.1.*
+                       , utf8-string >= 1 && < 2
+  build-tools:         happy, alex
+  default-language:    Haskell2010
+                        
+
+executable functional-compiler-exe
+  hs-source-dirs:      app
+  main-is:             Main.hs
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  build-depends:       base
+                     , functional-compiler
+  build-tools:         happy, alex
+  default-language:    Haskell2010
+
+test-suite functional-compiler-test
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             Spec.hs
+  build-depends:       base
+                     , functional-compiler
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  default-language:    Haskell2010
+
+source-repository head
+  type:     git
+  location: https://github.com/jcepedavillamayor/functional-compiler
