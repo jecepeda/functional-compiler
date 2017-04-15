@@ -6,10 +6,11 @@ module Tokens where
 
 $digit = 0-9
 $alpha = [a-zA-Z]
+$whiteSpace = [\ ]
 
 tokens :-
-  $white+                       ;
-  [\; \n]+                       { \s -> TokenNewLine}
+  $whiteSpace+                   ;
+  [\n \;]+                      { \s -> TokenNewLine}
   var                           { \s -> TokenVar }
   $digit+                       { \s -> TokenInt (read s) }
   \=                            { \s -> TokenAssign }
@@ -27,7 +28,7 @@ data Token = TokenVar
            | TokenPlus
            | TokenMinus
            | TokenNewLine
-           | TokenTimes
+           | SpaceToken String
            deriving (Eq,Show)
 
 scanTokens = alexScanTokens
