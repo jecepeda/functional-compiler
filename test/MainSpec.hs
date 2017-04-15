@@ -1,5 +1,8 @@
 import Grammar
 import LexerSpec
+import GrammarSpec
 
 main :: IO ()
-main = lexerSpec
+main = do
+    lexerSpec
+    grammarSpec

@@ -39,11 +39,11 @@ parseError _ = error "Parse error"
 data Exp = Assign String IntOp
          | Tok IntOp
          | Sym String
-         deriving Show
+         deriving (Eq, Show)
 
 data IntOp = Int Int
            | Plus Int IntOp
            | Minus Int IntOp
-           deriving Show
+           deriving (Eq, Show)
 
 }
