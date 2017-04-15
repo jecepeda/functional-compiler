@@ -2,7 +2,6 @@ module LexerSpec
 where
 
 import Test.Hspec
-import Test.QuickCheck
 import Tokens
 
 lexerSpec :: IO()
