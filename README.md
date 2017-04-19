@@ -19,6 +19,10 @@ The objectives of the case study are:
 - The lexer has been implemented using [Alex](https://www.haskell.org/alex/), which is a tool for generating lexical analyzers in Haskell. This tool is similar to the tool [Flex](https://github.com/westes/flex) and [Jflex](http://www.jflex.de/). A tutorial showing how to use alex can be found [here](https://www.haskell.org/alex/doc/alex.pdf)
 - The syntax parser has benn implemented using [Happy](https://www.haskell.org/happy/). Happy is a parser generator system: it takes a file containing a BNF specification and produces a Haskell containing a parser for the grammar. A tutorial showing how to use Happy can be found [here](https://www.haskell.org/happy/doc/happy.pdf)
 
+### Which language do we want to describe?
+
+The BNF syntax for the grammar can be found [here](src/grammar_specification.ebnf)
+
 ### ¿How to run the code?
 TODO
 
