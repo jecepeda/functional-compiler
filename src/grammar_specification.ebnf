@@ -1,0 +1,76 @@
+prog = exp prog | exp;
+
+(*
+%left '+' '-'
+%left '*' '/'
+%left '<' '>' '<=' '>='
+%left '&&' '||'
+*)
+
+exp = assignation      |
+      if_expression    |
+      print_expression |
+      while_expression |
+      operation        ;
+
+assignation = var ident assignToken intOp newLineToken;
+
+intOp = ident                   |
+        intToken                |
+        intToken plus intOp     |
+        intToken minus intOp    |
+        intToken multiply intOp |
+        intToken divide intOp   ;
+
+if_expression = if_body endIf newLineToken |
+                if_body else_expr          ;
+
+if_body = ifToken condition newLineToken if_bloq ;
+
+else_expr = elseToken newLineToken if_bloq endIfToken newLineToken ;
+
+if_bloq = bloq if_bloq  | 
+          bloq          ;
+
+bloq = assignation      |
+       operation        |
+       print_expression ;
+
+condition = intOp                           |
+            intOp conditionToken condition  ;
+
+while_expression = whileToken condition newLineToken bloq_while endWhileToken newLineToken ;
+
+bloq_while = bloq bloq_while | 
+             bloq            ;
+
+operation = intOp newLineToken ;
+
+print_expression = printToken intOp newLineToken ;
+
+intToken = "[0-9]+" ;
+
+ifToken = "if" ;
+
+endIfToken = "endif" ;
+
+whileToken = "while" ;
+
+endWhileToken = "endwhile" ;
+
+conditionToken = ['||' '&&' '<' '>' '<=' '>='] ;
+
+printToken = "print" ;
+
+newLineToken = '\n' ;
+
+plus = '+' ;
+
+minus = '-' ;
+
+multiply = '*' ;
+
+divide = '/' ;
+
+ident = [a-z A-Z \ \_ \'];
+
