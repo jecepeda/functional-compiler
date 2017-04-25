@@ -17,6 +17,18 @@ tokens :-
   \+                            { \s -> TokenPlus }
   \-                            { \s -> TokenMinus }
   $alpha [$alpha $digit \_ \']* { \s -> TokenSym s }
+  \||                           { \s -> TokenOr }
+  \&&                           { \s -> TokenAnd}
+  \<                            { \s -> TokenLess}
+  \>                            { \s -> TokenGreater}
+  \<=                           { \s -> TokenLessEqual}
+  \>=                           { \s -> TokenGreaterEqual}
+  \if                           { \s -> TokenIf}
+  \endif                        { \s -> TokenEndIf}
+  \while                        { \s -> TokenWhile}
+  \endwhile                     { \s -> TokenEndWhile}
+  \print                        { \s -> TokenPrint}
+
 
 {
 
@@ -29,6 +41,17 @@ data Token = TokenVar
            | TokenMinus
            | TokenNewLine
            | SpaceToken String
+           | TokenOr
+           | TokenAnd
+           | TokenLess
+           | TokenGreater
+           | TokenLessEqual
+           | TokenGreaterEqual
+           | TokenIf
+           | TokenEndIf
+           | TokenWhile
+           | TokenEndWhile
+           | TokenPrint
            deriving (Eq,Show)
 
 scanTokens = alexScanTokens

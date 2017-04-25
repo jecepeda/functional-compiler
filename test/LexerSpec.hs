@@ -35,3 +35,32 @@ lexerSpec = hspec $ do
                                   TokenPlus,
                                   TokenMinus]
             scanTokens "123 var helloWorld\n\n\n +-" `shouldBe` expectedTokens
+        
+        it "Return if token" $ do
+            let expectedTokens = [TokenIf]
+            scanTokens "if" `shouldBe` expectedTokens
+        
+        it "Return endif token" $ do
+            let expectedTokens = [TokenEndIf]
+            scanTokens "endif" `shouldBe expectedTokens
+
+        it "Return while token" $ do
+            let expectedTokens = [TokenWhile]
+            scanTokens "while" `shouldBe` expectedTokens
+
+        it "Return endwhile token" $ do
+            let expectedTokens = [TokenEndWhile]
+            scanTokens "endwhile" `shouldBe` expectedTokens
+        
+        it "Return all condition Tokens" $ do
+            let expectedTokens = [TokenOr,
+                                  TojenAnd,
+                                  TokenLess,
+                                  TokenGreater,
+                                  TokenLessEqual,
+                                  TokenGraterEqual]
+            scanTokens "|| && < > <= >=" `shouldBe expectedTokens
+        
+        it "Return print token" $ do
+            let expectedTokens = [TokenPrint]
+            scanTokens "print" 'shouldBe expectedTokens

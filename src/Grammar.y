@@ -8,13 +8,23 @@ import Tokens
 %error { parseError }
 
 %token
-    nl  { TokenNewLine }
-    int { TokenInt $$ }
-    var { TokenVar}
-    sym { TokenSym $$}
-    '=' { TokenAssign }
-    '+' { TokenPlus }
-    '-' { TokenMinus }
+    nl          { TokenNewLine }
+    int         { TokenInt $$ }
+    var         { TokenVar}
+    sym         { TokenSym $$}
+    '='         { TokenAssign }
+    '+'         { TokenPlus }
+    '-'         { TokenMinus }
+    '||'        { TokenOr }
+    '&&'        { TokenAnd }
+    '<'         { TokenLess }
+    '>'         { TokenGreater }
+    '<='        { TokenLessEqual }
+    '>='        { TokenGreaterEqual}
+    'if'        { TokenIf }
+    'endif'     { TokenEndIf }
+    'while'     { TokenWhile }
+    'endwhile'  { TokenEndWhile }
 
 %left '+' '-'
 
@@ -28,8 +38,24 @@ Exp : var sym '=' IntOp nl     { Assign $2 $4 }
     | sym nl                   { Sym $1 }
 
 IntOp : int                  { Int $1 }
-    | int '+' IntOp          { Plus $1 $3}
-    | int '-' IntOp          { Minus $1 $3}
+    | int '+' IntOp          { Plus $1 $3 } 
+    | int '-' IntOp          { Minus $1 $3 }
+    | int '*' IntOp          { Multiply $1 $3 }
+    | int '/' IntOp          { Divide $1 $3 }
+
+Cond : intOp '||' Cond       { Or $1 $3 }
+     | intOp '&&' Cond       { And $1 $3 }
+     | intOp '<' Cond        { Less $1 $3 }
+     | intOp '>' Cond        { Greater $1 $3 }
+     | intOp '<=' Cond       { LessEqual $1 $3 }
+     | intOp '>=' Cond       { GreaterEqual $1 $3 }
+
+IfCond : if Cond nl Exp nl endif
+       | if Cond nl IntOp nl endif
+
+WhileCond : while Cond nl Exp nl endwhile
+          | if Cond nl IntOp nl endwhile
+
 
 {
 
