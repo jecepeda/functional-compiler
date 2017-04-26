@@ -7,6 +7,8 @@ import Tokens
 %tokentype { Token }
 %error { parseError }
 
+$whiteSpace = [\ ]
+
 %token
     nl          { TokenNewLine }
     int         { TokenInt $$ }
@@ -22,20 +24,26 @@ import Tokens
     '<='        { TokenLessEqual }
     '>='        { TokenGreaterEqual}
     'if'        { TokenIf }
+    'else'      { TokenElse }
     'endif'     { TokenEndIf }
     'while'     { TokenWhile }
     'endwhile'  { TokenEndWhile }
+    'print'     { TokenPrint }
+    '[\ ]'      { TokenWhiteSpace }
 
 %left '+' '-'
 
 %%
 
-Prog : Exp Prog              { $1 : $2} 
+Prog : Exp Prog              { $1 : $2 } 
      | Exp                   { [$1] }
 
 Exp : var sym '=' IntOp nl     { Assign $2 $4 }
     | IntOp nl                 { Tok $1 }
     | sym nl                   { Sym $1 }
+    | IfCond nl                { Tok $1 }
+    | WhileCond nl             { Tok $1 }
+    | Print nl                 { Sym $1 }
 
 IntOp : int                  { Int $1 }
     | int '+' IntOp          { Plus $1 $3 } 
@@ -50,11 +58,14 @@ Cond : intOp '||' Cond       { Or $1 $3 }
      | intOp '<=' Cond       { LessEqual $1 $3 }
      | intOp '>=' Cond       { GreaterEqual $1 $3 }
 
-IfCond : if Cond nl Exp nl endif
-       | if Cond nl IntOp nl endif
+IfCond : if Cond nl Exp nl endif            { [$4] }
 
-WhileCond : while Cond nl Exp nl endwhile
-          | if Cond nl IntOp nl endwhile
+ElseCond : if Cond nl else Exp nl endif     { [$5] }
+
+WhileCond : while Cond nl Exp nl endwhile   { [$4] }
+
+Print : Exp '[\ ]' Print                    { [$1] }
+          
 
 
 {
