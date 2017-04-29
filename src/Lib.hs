@@ -14,8 +14,7 @@ addToDataStore l val = val:l
 getVal :: String -> [MapValue] -> Int
 getVal a store = case lookup a store of
     Just val -> val
-    Nothing -> error "Undeclared variable"
-
+    Nothing  -> 0
 
 calcIntOp :: IntOp -> [MapValue] -> Int
 calcIntOp (Int a) _ = a
@@ -36,10 +35,49 @@ saveVal (var, val) store = return ( case lookup var store of
     Just _ -> updateDataStore store (var, val)
     Nothing -> addToDataStore store (var, val))
 
+evalCond :: Conditional -> [MapValue] -> Bool
+evalCond (Less val1 val2) store = calcIntOp val1 store < calcIntOp val2 store
+evalCond (LessEqual val1 val2) store = calcIntOp val1 store <= calcIntOp val2 store
+evalCond (Greater val1 val2) store = calcIntOp val1 store > calcIntOp val2 store
+evalCond (GreaterEqual val1 val2) store = calcIntOp val1 store >= calcIntOp val2 store 
+
+
+evalIfExpression :: IfBody -> [MapValue] -> IO [MapValue]
+evalIfExpression (If cond part1) store = do
+    if evalCond cond store
+        then eval part1 store
+        else return store
+evalIfExpression (IfElse cond part1 part2) store = do
+    if evalCond cond store
+        then eval part1 store
+        else eval part2 store
+
+evalWhileExpression :: Conditional -> [Exp] -> [MapValue] -> IO [MapValue]
+evalWhileExpression cond val store = do
+    if evalCond cond store
+        then do
+            newStore <- eval val store
+            evalWhileExpression cond val newStore
+        else return store
+
+printValue :: IntOp -> [MapValue] -> IO [MapValue]
+printValue val store = do
+    print (calcIntOp val store)
+    return store
+
 evalItem :: Exp -> [MapValue] -> IO [MapValue]
 evalItem (Assign val intOp) store = do
     let res = calcIntOp intOp store
     saveVal (val, res) store
+evalItem (Tok val) store = do
+    let _ = calcIntOp val store
+    return store
+evalItem (IfExp val) store = do
+    evalIfExpression val store
+evalItem (Print val) store = do
+    printValue val store
+evalItem (WhileExp cond val) store = do
+    evalWhileExpression cond val store
 
 eval :: [Exp] -> [MapValue] -> IO [MapValue]
 eval [x] store = evalItem x store

@@ -32,33 +32,33 @@ import Tokens
 %left '+' '-'
 %left '*' '/'
 %left '<' '>' '<=' '>='
-%left '&&' '||'
 
 %%
 
 prog : exp prog              { $1 : $2 } 
      | exp                   { [$1] }
 
-exp : var sym '=' int_op nl     { Assign $2 $4 }
-    | int_op nl                 { Tok $1 }
-    | if_expression             { IfExp $1 } 
+exp : if_expression                                    { IfExp $1 }
+    | print int_op nl                                  { Print $2 }
+    | while while_cond while_body endwhile nl          { WhileExp $2 $3}
+    | var sym '=' int_op nl                            { Assign $2 $4 }
+    | int_op nl                                        { Tok $1 }
 
 if_expression : if if_cond if_body endif nl                     { If $2 $3 }
               | if if_cond if_body else nl else_body endif nl   { IfElse $2 $3 $6 }
 
 if_cond : cond nl { $1 }
 
-if_body : bloq if_body { $1 : $2 }
-       |  bloq        { [$1] }
+while_cond : cond nl { $1 }
 
-else_body : bloq else_body { $1: $2 }
-          | bloq          { [$1] }
+while_body : prog   { $1 }
 
-bloq : var sym '=' int_op nl     { BloqAssign $2 $4 }
-     | int_op nl                 { BloqTok $1 }
+if_body : prog      {$1}
 
-int_op : sym                  { Sym $1 }
-       | int                     { Int $1 }
+else_body : prog    {$1}
+
+int_op : sym                        { Sym $1 }
+       | int                        { Int $1 }
        | int_op '+' int_op          { Plus $1 $3 } 
        | int_op '-' int_op          { Minus $1 $3 }
        | int_op '*' int_op          { Multiply $1 $3 }
@@ -77,15 +77,13 @@ parseError _ = error "Parse error"
 data Exp = Assign String IntOp
          | Tok IntOp
          | IfExp IfBody
+         | Print IntOp
+         | WhileExp Conditional [Exp]
          deriving (Eq, Show)
 
-data IfBody = If Conditional [Bloq]
-            | IfElse Conditional [Bloq] [Bloq]
+data IfBody = If Conditional [Exp]
+            | IfElse Conditional [Exp] [Exp]
             deriving (Eq, Show)
-
-data Bloq = BloqAssign String IntOp
-          | BloqTok IntOp
-          deriving (Eq, Show)
 
 data Conditional = Less IntOp IntOp
           | LessEqual IntOp IntOp

@@ -35,9 +35,14 @@ grammarSpec = hspec $ do
 
     it "Returns an if condition" $ do
       let tokens = [TokenIf, TokenInt 3, TokenLess, TokenInt 4, TokenNewLine, TokenInt 3, TokenNewLine, TokenEndIf, TokenNewLine]
-      let expectedStructure = [IfExp (If (Less (Int 3) (Int 4)) [BloqTok (Int 3)])]
+      let expectedStructure = [IfExp (If (Less (Int 3) (Int 4)) [Tok (Int 3)])]
       parseTokenss tokens `shouldBe` expectedStructure
     
+    it "Returns a print statement" $ do
+      let tokens = [TokenPrint,TokenSym "a",TokenNewLine]
+      let expectedStructure = [Print (Sym "a")]
+      parseTokenss tokens `shouldBe` expectedStructure
+
     it "Returns an ifelse condition" $ do
       let tokens = [TokenIf, TokenInt 3, TokenLess, 
                     TokenInt 4, TokenNewLine, TokenInt 4,
@@ -45,5 +50,5 @@ grammarSpec = hspec $ do
                     TokenInt 4, TokenNewLine, TokenEndIf, 
                     TokenNewLine]
 
-      let expectedStructure = [IfExp (IfElse (Less (Int 3) (Int 4)) [BloqTok (Int 4)] [BloqTok (Int 4)])]
+      let expectedStructure = [IfExp (IfElse (Less (Int 3) (Int 4)) [Tok (Int 4)] [Tok (Int 4)])]
       parseTokenss tokens `shouldBe` expectedStructure

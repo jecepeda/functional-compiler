@@ -36,8 +36,7 @@ bloq = assignation      |
        operation        |
        print_expression ;
 
-condition = intOp                           |
-            intOp conditionToken condition  ;
+condition = intOp conditionToken intOp  ;
 
 while_expression = whileToken condition newLineToken bloq_while endWhileToken newLineToken ;
 
