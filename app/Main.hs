@@ -1,6 +1,11 @@
 module Main where
 
 import Lib
+import Grammar
+import Tokens
 
-main :: IO ()
-main = print "Hello world"
+main = do
+  content <- readFile "app/example"
+  let tokens = scanTokens content
+  let structure = parseTokenss tokens
+  eval structure emptyDataStore

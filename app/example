@@ -1,0 +1,13 @@
+var times = 40;
+var n1 = 1;
+var n2 = 1;
+
+print n1;
+print n2;
+while times > 0
+  var times = times - 1;
+  var aux = n2;
+  var n2 = n2 + n1;
+  var n1 = aux;
+  print n2;
+endwhile
