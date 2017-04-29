@@ -11,10 +11,17 @@ emptyDataStore = []
 addToDataStore :: [MapValue] -> MapValue -> [MapValue]
 addToDataStore l val = val:l
 
-calcIntOp :: IntOp -> Int
-calcIntOp (Int a) = a
-calcIntOp (Plus a intOp) = a + calcIntOp intOp
-calcIntOp (Minus a intOp) = a - calcIntOp intOp
+getVal :: String -> [MapValue] -> Int
+getVal a store = case lookup a store of
+    Just val -> val
+    Nothing -> error "Undeclared variable"
+
+
+calcIntOp :: IntOp -> [MapValue] -> Int
+calcIntOp (Int a) _ = a
+calcIntOp (Sym a) store = getVal a store
+calcIntOp (Plus  val1 val2) store = calcIntOp val1 store + calcIntOp val2 store
+calcIntOp (Minus val1 val2) store = calcIntOp val1 store - calcIntOp val2 store
 
 changeMapValue :: MapValue -> MapValue -> MapValue
 changeMapValue val1@(a, _) val2@(c, _) 
@@ -24,18 +31,18 @@ changeMapValue val1@(a, _) val2@(c, _)
 updateDataStore :: [MapValue] -> MapValue -> [MapValue]
 updateDataStore store mapVal = map (changeMapValue mapVal) store
 
-saveVal :: MapValue-> [MapValue] -> [MapValue]
-saveVal (var, val) store = case lookup var store of
+saveVal :: MapValue-> [MapValue] -> IO [MapValue]
+saveVal (var, val) store = return ( case lookup var store of
     Just _ -> updateDataStore store (var, val)
-    Nothing -> addToDataStore store (var, val)
+    Nothing -> addToDataStore store (var, val))
 
-evalItem :: Exp -> [MapValue] -> [MapValue]
-evalItem (Assign val intOp) store = saveVal (val, res) store
-    where res = calcIntOp intOp
-evalItem (Tok intOp) store = do
-    let val = calcIntOp(intOp)
-    store
+evalItem :: Exp -> [MapValue] -> IO [MapValue]
+evalItem (Assign val intOp) store = do
+    let res = calcIntOp intOp store
+    saveVal (val, res) store
 
-eval :: [Exp] -> [MapValue] -> [MapValue]
+eval :: [Exp] -> [MapValue] -> IO [MapValue]
 eval [x] store = evalItem x store
-eval (x:xs) store = eval xs (evalItem x store)
+eval (x:xs) store = do
+        newStore <- evalItem x store
+        eval xs newStore

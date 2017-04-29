@@ -25,10 +25,25 @@ grammarSpec = hspec $ do
 
     it "Returns a calculation (sum multiply)" $ do
       let tokens = [TokenInt 3, TokenPlus, TokenInt 4, TokenMultiply, TokenInt 5, TokenNewLine]
-      let expectedStructure = [Tok (Plus 3 (Multiply 4 (Int 5)))]
+      let expectedStructure = [Tok (Plus (Int 3) (Multiply (Int 4) (Int 5)))]
       parseTokenss tokens `shouldBe` expectedStructure
     
     it "Returns a calculation (minus divide)" $ do
       let tokens = [TokenInt 3, TokenDivide, TokenInt 4, TokenMinus, TokenInt 5, TokenNewLine]
-      let expectedStructure = [Tok (Divide 3 (Minus 4 (Int 5)))]
+      let expectedStructure = [Tok (Minus (Divide (Int 3) (Int 4)) (Int 5))]
+      parseTokenss tokens `shouldBe` expectedStructure
+
+    it "Returns an if condition" $ do
+      let tokens = [TokenIf, TokenInt 3, TokenLess, TokenInt 4, TokenNewLine, TokenInt 3, TokenNewLine, TokenEndIf, TokenNewLine]
+      let expectedStructure = [IfExp (If (Less (Int 3) (Int 4)) [BloqTok (Int 3)])]
+      parseTokenss tokens `shouldBe` expectedStructure
+    
+    it "Returns an ifelse condition" $ do
+      let tokens = [TokenIf, TokenInt 3, TokenLess, 
+                    TokenInt 4, TokenNewLine, TokenInt 4,
+                    TokenNewLine, TokenElse, TokenNewLine,
+                    TokenInt 4, TokenNewLine, TokenEndIf, 
+                    TokenNewLine]
+
+      let expectedStructure = [IfExp (IfElse (Less (Int 3) (Int 4)) [BloqTok (Int 4)] [BloqTok (Int 4)])]
       parseTokenss tokens `shouldBe` expectedStructure

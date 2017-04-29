@@ -43,8 +43,8 @@ exp : var sym '=' int_op nl     { Assign $2 $4 }
     | int_op nl                 { Tok $1 }
     | if_expression             { IfExp $1 } 
 
-if_expression : if if_cond if_body endif nl { If $2 $3 }
-              | if if_cond if_body else else_body endif nl   { IfElse $2 $3 $5 }
+if_expression : if if_cond if_body endif nl                     { If $2 $3 }
+              | if if_cond if_body else nl else_body endif nl   { IfElse $2 $3 $6 }
 
 if_cond : cond nl { $1 }
 
@@ -59,10 +59,10 @@ bloq : var sym '=' int_op nl     { BloqAssign $2 $4 }
 
 int_op : sym                  { Sym $1 }
        | int                     { Int $1 }
-       | int '+' int_op          { Plus $1 $3 } 
-       | int '-' int_op          { Minus $1 $3 }
-       | int '*' int_op          { Multiply $1 $3 }
-       | int '/' int_op          { Divide $1 $3 }
+       | int_op '+' int_op          { Plus $1 $3 } 
+       | int_op '-' int_op          { Minus $1 $3 }
+       | int_op '*' int_op          { Multiply $1 $3 }
+       | int_op '/' int_op          { Divide $1 $3 }
 
 cond : int_op '<'  int_op             { Less $1 $3 }
      | int_op '<=' int_op             { LessEqual $1 $3 }
@@ -95,10 +95,10 @@ data Conditional = Less IntOp IntOp
 
 data IntOp = Int Int
            | Sym String
-           | Plus Int IntOp
-           | Minus Int IntOp
-           | Multiply Int IntOp
-           | Divide Int IntOp
+           | Plus IntOp IntOp
+           | Minus IntOp IntOp
+           | Multiply IntOp IntOp
+           | Divide IntOp IntOp
            deriving (Eq, Show)
 
 }

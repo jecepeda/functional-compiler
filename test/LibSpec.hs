@@ -11,4 +11,5 @@ libSpec = hspec $ do
         it "Assign a value correctly" $ do
             let expression = [(Assign "a" (Int 1))]
             let expected = [("a", 1)]
-            (eval expression emptyDataStore) `shouldBe` expected
+            obtained <- eval expression emptyDataStore
+            obtained `shouldBe` expected
