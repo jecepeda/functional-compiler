@@ -7,66 +7,67 @@ import Tokens
 %tokentype { Token }
 %error { parseError }
 
-$whiteSpace = [\ ]
-
 %token
     nl          { TokenNewLine }
     int         { TokenInt $$ }
     var         { TokenVar}
     sym         { TokenSym $$}
+    else        { TokenElse }
+    endif       { TokenEndIf }
+    while       { TokenWhile }
+    endwhile    { TokenEndWhile }
+    print       { TokenPrint }
+    if          { TokenIf }
     '='         { TokenAssign }
     '+'         { TokenPlus }
     '-'         { TokenMinus }
-    '||'        { TokenOr }
-    '&&'        { TokenAnd }
+    '*'         { TokenMultiply }
+    '/'         { TokenDivide }
     '<'         { TokenLess }
     '>'         { TokenGreater }
     '<='        { TokenLessEqual }
     '>='        { TokenGreaterEqual}
-    'if'        { TokenIf }
-    'else'      { TokenElse }
-    'endif'     { TokenEndIf }
-    'while'     { TokenWhile }
-    'endwhile'  { TokenEndWhile }
-    'print'     { TokenPrint }
-    '[\ ]'      { TokenWhiteSpace }
+
 
 %left '+' '-'
+%left '*' '/'
+%left '<' '>' '<=' '>='
+%left '&&' '||'
 
 %%
 
-Prog : Exp Prog              { $1 : $2 } 
-     | Exp                   { [$1] }
+prog : exp prog              { $1 : $2 } 
+     | exp                   { [$1] }
 
-Exp : var sym '=' IntOp nl     { Assign $2 $4 }
-    | IntOp nl                 { Tok $1 }
-    | sym nl                   { Sym $1 }
-    | IfCond nl                { Tok $1 }
-    | WhileCond nl             { Tok $1 }
-    | Print nl                 { Sym $1 }
+exp : var sym '=' int_op nl     { Assign $2 $4 }
+    | int_op nl                 { Tok $1 }
+    | if_expression             { IfExp $1 } 
 
-IntOp : int                  { Int $1 }
-    | int '+' IntOp          { Plus $1 $3 } 
-    | int '-' IntOp          { Minus $1 $3 }
-    | int '*' IntOp          { Multiply $1 $3 }
-    | int '/' IntOp          { Divide $1 $3 }
+if_expression : if if_cond if_body endif nl { If $2 $3 }
+              | if if_cond if_body else else_body endif nl   { IfElse $2 $3 $5 }
 
-Cond : intOp '||' Cond       { Or $1 $3 }
-     | intOp '&&' Cond       { And $1 $3 }
-     | intOp '<' Cond        { Less $1 $3 }
-     | intOp '>' Cond        { Greater $1 $3 }
-     | intOp '<=' Cond       { LessEqual $1 $3 }
-     | intOp '>=' Cond       { GreaterEqual $1 $3 }
+if_cond : cond nl { $1 }
 
-IfCond : if Cond nl Exp nl endif            { [$4] }
+if_body : bloq if_body { $1 : $2 }
+       |  bloq        { [$1] }
 
-ElseCond : if Cond nl else Exp nl endif     { [$5] }
+else_body : bloq else_body { $1: $2 }
+          | bloq          { [$1] }
 
-WhileCond : while Cond nl Exp nl endwhile   { [$4] }
+bloq : var sym '=' int_op nl     { BloqAssign $2 $4 }
+     | int_op nl                 { BloqTok $1 }
 
-Print : Exp '[\ ]' Print                    { [$1] }
-          
+int_op : sym                  { Sym $1 }
+       | int                     { Int $1 }
+       | int '+' int_op          { Plus $1 $3 } 
+       | int '-' int_op          { Minus $1 $3 }
+       | int '*' int_op          { Multiply $1 $3 }
+       | int '/' int_op          { Divide $1 $3 }
 
+cond : int_op '<'  int_op             { Less $1 $3 }
+     | int_op '<=' int_op             { LessEqual $1 $3 }
+     | int_op '>'  int_op             { Greater $1 $3 }
+     | int_op '>=' int_op             { GreaterEqual $1 $3 }
 
 {
 
@@ -75,12 +76,29 @@ parseError _ = error "Parse error"
 
 data Exp = Assign String IntOp
          | Tok IntOp
-         | Sym String
+         | IfExp IfBody
          deriving (Eq, Show)
 
+data IfBody = If Conditional [Bloq]
+            | IfElse Conditional [Bloq] [Bloq]
+            deriving (Eq, Show)
+
+data Bloq = BloqAssign String IntOp
+          | BloqTok IntOp
+          deriving (Eq, Show)
+
+data Conditional = Less IntOp IntOp
+          | LessEqual IntOp IntOp
+          | Greater IntOp IntOp
+          | GreaterEqual IntOp IntOp
+          deriving (Eq, Show)
+
 data IntOp = Int Int
+           | Sym String
            | Plus Int IntOp
            | Minus Int IntOp
+           | Multiply Int IntOp
+           | Divide Int IntOp
            deriving (Eq, Show)
 
 }

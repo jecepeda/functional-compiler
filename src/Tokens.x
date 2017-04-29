@@ -9,26 +9,27 @@ $alpha = [a-zA-Z]
 $whiteSpace = [\ ]
 
 tokens :-
-  $whiteSpace+                   ;
+  $whiteSpace+                  ;
+  \t+                           ;
   [\n \;]+                      { \s -> TokenNewLine}
   var                           { \s -> TokenVar }
-  $digit+                       { \s -> TokenInt (read s) }
+  if                            { \s -> TokenIf }
+  else                          { \s -> TokenElse }
+  endif                         { \s -> TokenEndIf}
+  while                         { \s -> TokenWhile}
+  endwhile                      { \s -> TokenEndWhile}
+  print                         { \s -> TokenPrint}
+  \<                            { \s -> TokenLess }
+  \>                            { \s -> TokenGreater }
+  \<=                           { \s -> TokenLessEqual }
+  \>=                           { \s -> TokenGreaterEqual }
   \=                            { \s -> TokenAssign }
   \+                            { \s -> TokenPlus }
   \-                            { \s -> TokenMinus }
+  \*                            { \s -> TokenMultiply }
+  \/                            { \s -> TokenDivide }
+  $digit+                       { \s -> TokenInt (read s) }
   $alpha [$alpha $digit \_ \']* { \s -> TokenSym s }
-  \||                           { \s -> TokenOr }
-  \&&                           { \s -> TokenAnd}
-  \<                            { \s -> TokenLess}
-  \>                            { \s -> TokenGreater}
-  \<=                           { \s -> TokenLessEqual}
-  \>=                           { \s -> TokenGreaterEqual}
-  \if                           { \s -> TokenIf}
-  \endif                        { \s -> TokenEndIf}
-  \while                        { \s -> TokenWhile}
-  \endwhile                     { \s -> TokenEndWhile}
-  \print                        { \s -> TokenPrint}
-
 
 {
 
@@ -39,6 +40,8 @@ data Token = TokenVar
            | TokenAssign
            | TokenPlus
            | TokenMinus
+           | TokenMultiply
+           | TokenDivide
            | TokenNewLine
            | SpaceToken String
            | TokenOr
@@ -48,6 +51,7 @@ data Token = TokenVar
            | TokenLessEqual
            | TokenGreaterEqual
            | TokenIf
+           | TokenElse
            | TokenEndIf
            | TokenWhile
            | TokenEndWhile

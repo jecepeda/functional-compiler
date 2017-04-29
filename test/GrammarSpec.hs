@@ -5,79 +5,30 @@ import Test.Hspec
 import Tokens
 import Grammar
 
-grammarSpec :: IO()
+grammarSpec :: IO ()
 grammarSpec = hspec $ do
-    describe "Grammar" $ do
-        it "Gets an assigment structure" $ do
-            let expectedStructure = [Assign "a" (Int 1)]
-            let tokens = [TokenVar,
-                          TokenSym "a",
-                          TokenAssign,
-                          TokenInt 1,
-                          TokenNewLine]
-            parseTokenss tokens `shouldBe` expectedStructure
+  describe "Grammar" $ do
+    it "Returns an int" $ do
+      let tokens = [TokenInt 123, TokenNewLine]
+      let expectedStructure = [Tok (Int 123)]
+      parseTokenss tokens `shouldBe` expectedStructure
 
-        it "Gets an intOp structure" $ do
-            let expectedStructure = [Tok (Plus 2 (Minus 2 (Int 1)))]
-            let tokens = [TokenInt 2,
-                          TokenPlus,
-                          TokenInt 2,
-                          TokenMinus,
-                          TokenInt 1, 
-                          TokenNewLine]
-            parseTokenss tokens `shouldBe` expectedStructure
+    it "Returns a var" $ do
+      let tokens = [TokenSym "abc", TokenNewLine]
+      let expectedStructure = [Tok (Sym "abc")]
+      parseTokenss tokens `shouldBe` expectedStructure
+      
+    it "Returns a variable assignment" $ do
+      let tokens = [TokenVar, TokenSym "abc", TokenAssign, TokenInt 3, TokenNewLine]
+      let expectedStructure = [Assign "abc" (Int 3)]
+      parseTokenss tokens `shouldBe` expectedStructure
 
-        it "Gets a variable call" $ do
-            let expectedStructure = [Sym "a"]
-            let tokens = [TokenSym "a", TokenNewLine]
-            parseTokenss tokens `shouldBe` expectedStructure
-
-        it "Gets more than one structure" $ do
-            let expectedStructure = [Sym "a", Sym "b"]
-            let tokens = [TokenSym "a", TokenNewLine, TokenSym "b", TokenNewLine]
-            parseTokenss tokens `shouldBe` expectedStructure
-        
-        it "Gets an if conditional" $ do
-            let expectedStructure = [Tok 1, Tok 2, Assign "a" (Int 1),Assign "a" (Int 2)]
-            let tokens = [TokenIf,
-                         TokenInt 1,
-                         TokenLess,
-                         TokenInt 2,
-                         TokenNewLine,
-                         TokenVar,
-                         TokenSym "a",
-                         TokenAssign,
-                         TokenInt 1,
-                         TokenNewLine,
-                         TokenElse,
-                         TokenNewLine,
-                         TokenVar,
-                         TokenSym "a",
-                         TokenAssign,
-                         TokenInt 2,
-                         TokenNewLine
-                         ]
-            parseTokenss tokens `shouldBe` expectedStructure
-        
-        it "Gets a while conditional" $ do
-            let expectedStructure = [Tok 1, Tok 2, Tok (Plus 2 (Minus 2 (Int 1)))]
-            let tokens = [TokenWhile,
-                         TokenInt 1,
-                         TokenLess,
-                         TokenInt 2,
-                         TokenNewLine,
-                         TokenInt 2,
-                         TokenPlus,
-                         TokenInt 2,
-                         TokenMinus,
-                         TokenInt 1, 
-                         TokenNewLine,
-                         TokenEndWhile
-                         ]
-            parseTokenss tokens `shouldBe` expectedStructure
-        
-        it "Gets a print" $ do
-            let expectedStructure = [Sym "HelloWorld"]
-            let tokens = [TokenPrint, TokenSym "HelloWorld", TokenNewLine]
-            parseTokenss tokens `shouldBe` expectedStructure
-            
+    it "Returns a calculation (sum multiply)" $ do
+      let tokens = [TokenInt 3, TokenPlus, TokenInt 4, TokenMultiply, TokenInt 5, TokenNewLine]
+      let expectedStructure = [Tok (Plus 3 (Multiply 4 (Int 5)))]
+      parseTokenss tokens `shouldBe` expectedStructure
+    
+    it "Returns a calculation (minus divide)" $ do
+      let tokens = [TokenInt 3, TokenDivide, TokenInt 4, TokenMinus, TokenInt 5, TokenNewLine]
+      let expectedStructure = [Tok (Divide 3 (Minus 4 (Int 5)))]
+      parseTokenss tokens `shouldBe` expectedStructure
