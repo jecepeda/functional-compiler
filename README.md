@@ -24,5 +24,7 @@ The objectives of the case study are:
 The BNF syntax for the grammar can be found [here](src/grammar_specification.ebnf)
 
 ### ¿How to run the code?
-TODO
+
+Once the project is built, you need to execute the following command:
+  * `stack exec functional-compiler-exe`
 
